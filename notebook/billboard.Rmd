@@ -1,0 +1,62 @@
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+```{r}
+billboard <- read_csv("../data/billboard_2000_2018_spotify_lyrics.csv")
+```
+                                                              EDA PORTION 
+```{r}
+#Checking the amount of songs on the Billboard list are in each genre.
+billboard |> 
+  count(broad_genre)
+```
+```{r}
+billboard |> 
+  count(year)
+```
+
+
+
+```{r}
+#Plotting the amount of songs per genre. 
+billboard |> 
+  count(broad_genre) |> 
+  ggplot(aes(x = broad_genre, y = n)) +
+  geom_col() +
+  labs(title = "Number of Songs in a Genre", x="Genre", y="Count")
+```
+```{r}
+#Removing the video link, simple title column.
+billboard <- billboard |> 
+  select(- video_link, simple_title)
+``` 
+
+```{r}
+#Removing the data with any missing information.
+  billboard <- 
+  billboard |> 
+  drop_na()
+```
+
+```{r}
+years = 2017
+billboard |> 
+  filter(year == years) |> 
+  count(main_artist) |> 
+  arrange(desc(n))
+  
+```
+```{r}
+output <- list()
+for (year in (billboard$year)) {
+  output[[year]] <- billboard |> 
+   filter(year == year) |> 
+  count(main_artist) |> 
+ arrange(desc(n))
+}
+```
+

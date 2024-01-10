@@ -8,19 +8,47 @@ library(dplyr)
 ```{r}
 billboard <- read_csv("../data/billboard_2000_2018_spotify_lyrics.csv")
 ```
-                                                              EDA PORTION 
+EDA PORTION 
+```{r}
+#Removing the video link, simple title column.
+billboard <- billboard |> 
+  select(- video_link, simple_title)
+```
+
+```{r}
+#Removing the data with any missing information.
+# billboard <- 
+# billboard |> 
+# drop_na()
+```
+
+```{r}
+#Changing columns to numeric
+billboard <- billboard |> 
+  mutate(across(c(energy, liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness, valence), as.numeric))
+```
+```{r}
+#Removing the data with any missing information.
+billboard <- 
+  billboard |> 
+  drop_na()
+```
+
+```{r}
+#Checking if there are any Nan values
+sapply(billboard, anyNA)
+```
+```{r}
+billboard |> 
+  arrange(desc(weeks))
+```
+
+
 ```{r}
 #Checking the amount of songs on the Billboard list are in each genre.
 billboard |> 
   count(broad_genre)
 ```
-```{r}
-billboard |> 
-  count(year)
-```
-
-
-
 ```{r}
 #Plotting the amount of songs per genre. 
 billboard |> 
@@ -30,33 +58,83 @@ billboard |>
   labs(title = "Number of Songs in a Genre", x="Genre", y="Count")
 ```
 ```{r}
-#Removing the video link, simple title column.
-billboard <- billboard |> 
-  select(- video_link, simple_title)
-``` 
-
-```{r}
-#Removing the data with any missing information.
-  billboard <- 
-  billboard |> 
-  drop_na()
-```
-
-```{r}
-years = 2017
+#Looking at rap closely since it has the highest amount of songs on billboards
 billboard |> 
-  filter(year == years) |> 
-  count(main_artist) |> 
-  arrange(desc(n))
-  
+  filter(broad_genre == "rap")
+```
+
+```{r}
+#function that will find the mean of columns
+find_mean <- function(summary_variable){
+  billboard |> 
+    summarize("mean_{{ summary_variable }}" := mean({{ summary_variable }}, na.rm = TRUE))
+}
+```
+#liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness
+```{r}
+billboard |> 
+  filter(broad_genre == "rap") 
+find_mean(energy)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# billboard |> 
+#   count(year)
 ```
 ```{r}
-output <- list()
-for (year in (billboard$year)) {
-  output[[year]] <- billboard |> 
-   filter(year == year) |> 
-  count(main_artist) |> 
- arrange(desc(n))
-}
+# years = 2017
+# billboard |> 
+#   filter(year == years) |> 
+#   count(main_artist) |> 
+#   arrange(desc(n))
+
+```
+```{r}
+# billboard |> 
+#   group_by(year) |> 
+#   count(main_artist)
+# ```
+# ```{r}
+# billboard |> 
+#   group_by(main_artist, year) |> 
+#   count()
+# ```
+# ```{r}
+# 
+# ```
+# 
+# ```{r}
+# find_top <- function(summary_variable){
+#   billboard |> 
+#     filter(year == year) |> 
+#   count(main_artist) |> 
+#  arrange(desc(n))
+#   }
+# ```
+# ```{r}
+# year = 2017
+# billboard |> 
+#   find_top()
 ```
 

@@ -42,6 +42,72 @@ sapply(billboard, anyNA)
 billboard |> 
   arrange(desc(weeks))
 ```
+```{r}
+#Descriptive summary of weeks.
+billboard |> 
+  select(weeks) |> 
+  summary()
+```
+```{r}
+#A song above average spend more than 13 weeks on the charts.
+long_charted <- 
+  billboard |> 
+  filter(weeks > 13)  
+```
+
+```{r}
+#Checking the genre of the songs that charted the longest.
+long_charted |> 
+  count(broad_genre)
+```
+
+```{r}
+#Plotting the amount of songs per genre. 
+long_charted |> 
+  count(broad_genre) |> 
+  ggplot(aes(x = broad_genre, y = n)) +
+  geom_col() +
+  labs(title = "Number of Songs in a Genre", x="Genre", y="Count")
+```
+
+```{r}
+billboard |> 
+  filter(artist == "mariah carey")
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == ("unknown"))
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```{r}

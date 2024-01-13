@@ -4,6 +4,8 @@
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
+library(clock)
+library(lubridate)
 ```
 ```{r}
 billboard <- read_csv("../data/billboard_2000_2018_spotify_lyrics.csv")
@@ -12,14 +14,7 @@ EDA PORTION
 ```{r}
 #Removing the video link, simple title column.
 billboard <- billboard |> 
-  select(- video_link, simple_title)
-```
-
-```{r}
-#Removing the data with any missing information.
-# billboard <- 
-# billboard |> 
-# drop_na()
+  select(-c(video_link, simple_title, spotify_link, spotify_id, lyrics, analysis_url))
 ```
 
 ```{r}
@@ -27,6 +22,7 @@ billboard <- billboard |>
 billboard <- billboard |> 
   mutate(across(c(energy, liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness, valence), as.numeric))
 ```
+
 ```{r}
 #Removing the data with any missing information.
 billboard <- 
@@ -35,10 +31,28 @@ billboard <-
 ```
 
 ```{r}
+#Creating a column with just the months
+billboard <- billboard |> 
+  mutate(date = as.Date(date, format = "%m/%d/%y"),
+         month = month(date, label = TRUE))
+```
+
+```{r}
+billboard <- billboard %>%
+  mutate(seasons = case_when(
+    month %in% c("Dec", "Jan", "Feb") ~ "Winter",
+    month %in% c("Mar", "Apr", "May") ~ "Spring",
+    month %in% c("Jun", "Jul", "Aug") ~ "Summer",
+    month %in% c("Sep", "Oct", "Nov") ~ "Fall"
+  ))
+```
+
+```{r}
 #Checking if there are any Nan values
 sapply(billboard, anyNA)
 ```
 ```{r}
+#Arranging rows by the highest amount of weeks. 
 billboard |> 
   arrange(desc(weeks))
 ```
@@ -72,15 +86,141 @@ long_charted |>
 
 ```{r}
 billboard |> 
-  filter(artist == "mariah carey")
+  filter(title == "All I Want For Christmas Is You")
 ```
 
 ```{r}
+#Checking what songs are catergorized as unknown.
 long_charted |> 
   filter(broad_genre == ("unknown"))
 ```
 
 ```{r}
+#Code that will find the mean for all variables in each genre.
+chart_variables <-
+  long_charted |> 
+  select(energy, liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness) 
+```
+
+```{r}
+summary(chart_variables)
+```
+```{r}
+colMeans(chart_variables, na.rm = TRUE)
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "r&b")
+summary(chart_variables)
+```
+
+4. How does the month impact the type of songs that are popular.
+```{r}
+
+```
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "r&b") 
+find_mean(energy)
+```
+#liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness
+```{r}
+long_charted |> 
+  filter(broad_genre == "rap") 
+find_mean(liveness)
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "rap") 
+find_mean(tempo)
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "rap") 
+find_mean(speechiness)
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "rap") 
+find_mean(acousticness)
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "rap") 
+find_mean(danceability)
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "rap") 
+find_mean(duration_ms)
+```
+
+```{r}
+long_charted |> 
+  filter(broad_genre == "rap") 
+find_mean(loudness)
+```
+
+```{r}
+
+```
+
+```{r}
 
 ```
 
@@ -92,22 +232,37 @@ long_charted |>
 
 ```
 
+```{r}
 
+```
 
+```{r}
 
+```
 
+```{r}
 
+```
 
+```{r}
 
+```
 
+```{r}
 
+```
 
+```{r}
 
+```
 
+```{r}
 
+```
 
+```{r}
 
-
+```
 
 
 ```{r}
@@ -202,5 +357,13 @@ find_mean(energy)
 # year = 2017
 # billboard |> 
 #   find_top()
+```
+
+```{r}
+
+
+```
+```{r}
+
 ```
 

@@ -85,8 +85,20 @@ long_charted |>
 ```
 
 ```{r}
+#Checking which songs are on the charts ore than once.
+ billboard[duplicated(billboard$title),] |> 
+  arrange(title)
+```
+
+Below is 2 examples of songs that were on the chart a week and then back on the chart 10 days later????
+```{r}
 billboard |> 
-  filter(title == "All I Want For Christmas Is You")
+  filter(title == "All I Want For Christmas Is You") 
+```
+
+```{r}
+billboard |> 
+  filter(title == "Shape Of You")
 ```
 
 ```{r}
@@ -96,180 +108,215 @@ long_charted |>
 ```
 
 ```{r}
-#Code that will find the mean for all variables in each genre.
+#tibble with the following columns.
 chart_variables <-
   long_charted |> 
   select(energy, liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness) 
 ```
 
 ```{r}
+#Full summary of the below variables.
 summary(chart_variables)
 ```
+
 ```{r}
+chart_variables |> 
+  cor()
+```
+
+```{r}
+#The means of the variables.
 colMeans(chart_variables, na.rm = TRUE)
 ```
 
+ How does the month impact the type of songs that are popular.
 ```{r}
-long_charted |> 
-  filter(broad_genre == "r&b")
-summary(chart_variables)
-```
-
-4. How does the month impact the type of songs that are popular.
-```{r}
-
-```
-```{r}
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-long_charted |> 
-  filter(broad_genre == "r&b") 
-find_mean(energy)
-```
-#liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness
-```{r}
-long_charted |> 
-  filter(broad_genre == "rap") 
-find_mean(liveness)
+#A Tibble with the months that are not in the summer.
+summer_months <-
+  long_charted |> 
+  filter(seasons == "Summer")
 ```
 
 ```{r}
-long_charted |> 
-  filter(broad_genre == "rap") 
-find_mean(tempo)
+#Summary of summer months.
+summer_months |>  
+  dplyr::select(where(is.numeric)) |> 
+  summary()
+```
+```{r}
+summer_months |> 
+  ggplot(aes(x = tempo, y = energy, color = broad_genre)) +
+   geom_point()
 ```
 
 ```{r}
-long_charted |> 
-  filter(broad_genre == "rap") 
-find_mean(speechiness)
+summer_months |> 
+  group_by(broad_genre) |> 
+  summarize(across(.cols = where(is.numeric) & !year, .fns = ~mean(., na.rm = TRUE)))
 ```
 
 ```{r}
-long_charted |> 
-  filter(broad_genre == "rap") 
-find_mean(acousticness)
-```
-
-```{r}
-long_charted |> 
-  filter(broad_genre == "rap") 
-find_mean(danceability)
-```
-
-```{r}
-long_charted |> 
-  filter(broad_genre == "rap") 
-find_mean(duration_ms)
-```
-
-```{r}
-long_charted |> 
-  filter(broad_genre == "rap") 
-find_mean(loudness)
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-
-```{r}
-#Checking the amount of songs on the Billboard list are in each genre.
 billboard |> 
-  count(broad_genre)
+  group_by(broad_genre) |> 
+  summarize(across(.cols = where(is.numeric) & !year, .fns = ~mean(., na.rm = TRUE)))
 ```
+
+```{r}
+long_charted |> 
+  group_by(broad_genre) |> 
+  summarize(across(.cols = where(is.numeric) & !year, .fns = ~mean(., na.rm = TRUE)))
+```
+
+
+```{r}
+billboard |> 
+  group_by(seasons) |> 
+  summarize(across(.cols = where(is.numeric) & !year, .fns = ~mean(., na.rm = TRUE)))
+```
+
+```{r}
+long_charted |> 
+  group_by(seasons) |> 
+  summarize(across(.cols = where(is.numeric) & !year, .fns = ~mean(., na.rm = TRUE)))
+```
+
+
+```{r}
+billboard |> 
+  filter(artist == "outkast")
+```
+
+
+```{r}
+#A Tibble with the months that are not in the summer.
+non_summer_months <- 
+  long_charted |> 
+  filter(seasons != "Summer")
+```
+
+```{r}
+#Summary of non-summer months.
+non_summer_months |>  
+  dplyr::select(where(is.numeric)) |> 
+  summary()
+```
+
+```{r}
+write.csv(billboard, "../data/billboard_final\\.csv", row.names = FALSE)
+```
+```{r}
+write.csv(long_charted, "../data/long_charted\\.csv", row.names = FALSE)
+```
+
+```{r}
+write.csv(summer_months, "../data/summer_months\\.csv", row.names = FALSE)
+```
+
+```{r}
+write.csv(non_summer_months, "../data/non_summer_months\\.csv", row.names = FALSE)
+```
+
+```{r}
+write.csv(chart_variables, "../data/chart_variables\\.csv", row.names = FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
 ```{r}
 #Plotting the amount of songs per genre. 
 billboard |> 
@@ -278,11 +325,7 @@ billboard |>
   geom_col() +
   labs(title = "Number of Songs in a Genre", x="Genre", y="Count")
 ```
-```{r}
-#Looking at rap closely since it has the highest amount of songs on billboards
-billboard |> 
-  filter(broad_genre == "rap")
-```
+
 
 ```{r}
 #function that will find the mean of columns

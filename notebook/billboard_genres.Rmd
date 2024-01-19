@@ -1,0 +1,250 @@
+---
+title: "Billboard Genres"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(clock)
+library(lubridate)
+```
+
+```{r}
+billboard <- read_csv("../data/billboard_2000_2018_spotify_lyrics.csv")
+```
+```{r}
+#Removing the video link, simple title column.
+billboard <- billboard |> 
+  select(-c(video_link, simple_title, spotify_link, spotify_id, lyrics, analysis_url))
+```
+
+```{r}
+#Changing columns to numeric
+billboard <- billboard |> 
+  mutate(across(c(energy, liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness, valence), as.numeric))
+```
+
+```{r}
+#Removing the data with any missing information.
+billboard <- 
+  billboard |> 
+  drop_na()
+```
+
+```{r}
+#Creating a column with just the months
+billboard <- billboard |> 
+  mutate(date = as.Date(date, format = "%m/%d/%y"),
+         month = month(date, label = TRUE))
+```
+
+```{r}
+#creating a column that will have the season a song joined the charts.
+billboard <- billboard %>%
+  mutate(seasons = case_when(
+    month %in% c("Dec", "Jan", "Feb") ~ "Winter",
+    month %in% c("Mar", "Apr", "May") ~ "Spring",
+    month %in% c("Jun", "Jul", "Aug") ~ "Summer",
+    month %in% c("Sep", "Oct", "Nov") ~ "Fall"
+  ))
+```
+
+```{r}
+billboard |> 
+  dplyr::select(where(is.numeric)) |> 
+  summary()
+```
+
+```{r}
+billboard <- billboard |> 
+  filter(weeks >= 14, rank <= 50)
+```
+
+```{r}
+billboard |> 
+  dplyr::select(where(is.numeric)) |> 
+  summary()
+```
+
+
+```{r}
+billboard |> 
+  count(broad_genre)
+```
+
+```{r}
+country <-
+  billboard |> 
+  filter(broad_genre == "country")
+```
+
+```{r}
+edm <-
+  billboard |> 
+  filter(broad_genre == "edm")
+```
+
+```{r}
+pop <-
+  billboard |> 
+  filter(broad_genre == "pop")
+```
+
+```{r}
+unknown <-
+  billboard |> 
+  filter(broad_genre == "unknown")
+```
+
+```{r}
+rap <-
+  billboard |> 
+  filter(broad_genre == "rap")
+```
+
+```{r}
+rock <-
+  billboard |> 
+  filter(broad_genre == "rock")
+```
+
+```{r}
+rnb <-
+  billboard |> 
+  filter(broad_genre == "r&b")
+```
+
+```{r}
+country |> 
+  dplyr::select(where(is.numeric)) |> 
+  summary()
+```
+
+```{r}
+country |> 
+  dplyr::select(where(is.numeric)) |> 
+  cor()
+```
+
+```{r}
+country |> 
+  ggplot(aes(x = tempo, y = energy)) +
+   geom_point()
+```
+```{r}
+country |> 
+  select(tempo, energy) |> 
+  cor()
+```
+
+```{r}
+pop |> 
+  select(tempo, energy) |> 
+  cor()
+```
+
+```{r}
+rap |> 
+  select(tempo, energy) |> 
+  cor()
+```
+
+```{r}
+billboard |> 
+  select(weeks, energy) |> 
+  cor()
+```
+
+
+
+```{r}
+write.csv(billboard, "../data/billboard_genre\\.csv", row.names = FALSE)
+```
+
+```{r}
+billboard |> 
+  select(where(is.numeric), -year, -peak_pos, -weeks, -rank, -duration_ms, -last_pos, -mode, -time_signature, -key) |> 
+  colnames()
+```
+
+```{r}
+billboard |> 
+  select(where(is.numeric), -year, -peak_pos, -weeks, -rank, -duration_ms, -last_pos, -mode, -time_signature, -key, -tempo, -loudness) |> 
+  colMeans()
+```
+
+```{r}
+billboard |> 
+  select(where(is.numeric), -year, -peak_pos, -weeks, -rank, -duration_ms, -last_pos, -mode, -time_signature, -key, -tempo, -loudness) |> 
+  colMeans() |> 
+  enframe(name = "Variable", value = "Mean")  |> 
+  ggplot(aes(x = Variable, y = Mean)) +
+  geom_col() +
+  labs(title = "Column Means", x = "Variables", y = "Mean Value")
+  
+```
+REGRESSIONS
+
+```{r}
+billboard_weeks_lm <- lm("weeks ~ energy", data = billboard)
+```
+
+```{r}
+summary(billboard_weeks_lm)
+```
+
+```{r}
+reduced_model <- lm("weeks ~ energy", data = billboard)
+full_model <- lm("weeks ~ energy + liveness", data = billboard)
+
+anova(reduced_model, full_model)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

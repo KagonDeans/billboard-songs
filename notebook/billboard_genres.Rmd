@@ -16,13 +16,13 @@ billboard <- read_csv("../data/billboard_2000_2018_spotify_lyrics.csv")
 ```{r}
 #Removing the video link, simple title column.
 billboard <- billboard |> 
-  select(-c(video_link, simple_title, spotify_link, spotify_id, lyrics, analysis_url))
+  select(-c(video_link, simple_title, spotify_link, spotify_id, lyrics, analysis_url, genre, mode, key, time_signature))
 ```
 
 ```{r}
 #Changing columns to numeric
 billboard <- billboard |> 
-  mutate(across(c(energy, liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness, valence), as.numeric))
+  mutate(across(c(energy, instrumentalness, liveness, tempo, speechiness, acousticness, danceability, duration_ms, loudness, valence), as.numeric))
 ```
 
 ```{r}
@@ -33,10 +33,11 @@ billboard <-
 ```
 
 ```{r}
-#Creating a column with just the months
+#Creating a column with just the months & numbered weeks
 billboard <- billboard |> 
   mutate(date = as.Date(date, format = "%m/%d/%y"),
-         month = month(date, label = TRUE))
+         month = month(date, label = TRUE),
+         week_number = week(date))
 ```
 
 ```{r}
@@ -51,154 +52,107 @@ billboard <- billboard %>%
 ```
 
 ```{r}
-billboard |> 
-  dplyr::select(where(is.numeric)) |> 
-  summary()
-```
-
-```{r}
-billboard <- billboard |> 
-  filter(weeks >= 14, rank <= 50)
-```
-
-```{r}
-billboard |> 
-  dplyr::select(where(is.numeric)) |> 
-  summary()
-```
-
-
-```{r}
-billboard |> 
-  count(broad_genre)
-```
-
-```{r}
-country <-
+billboard <- 
   billboard |> 
-  filter(broad_genre == "country")
+  mutate(number_one = peak_pos == 1)
 ```
 
+title, energy, liveness, speechiness, ascousticness, instrumentalness, danceability, valence
+
+select(-c(year, peak_pos, weeks, rank, duration_ms, last_pos, mode, time_signature, key, tempo, loudness, date, main_artist, change, genre, broad_genre, month, week_number, seasons, artist)) 
+
 ```{r}
-edm <-
+top_songs <- billboard  |> 
+  group_by(year, broad_genre)  |> 
+  slice_max(order_by = weeks, n = 1)  |> 
+  ungroup() 
+
+billboard_pivoted <-
   billboard |> 
-  filter(broad_genre == "edm")
-```
-
-```{r}
-pop <-
-  billboard |> 
-  filter(broad_genre == "pop")
-```
-
-```{r}
-unknown <-
-  billboard |> 
-  filter(broad_genre == "unknown")
-```
-
-```{r}
-rap <-
-  billboard |> 
-  filter(broad_genre == "rap")
-```
-
-```{r}
-rock <-
-  billboard |> 
-  filter(broad_genre == "rock")
-```
-
-```{r}
-rnb <-
-  billboard |> 
-  filter(broad_genre == "r&b")
-```
-
-```{r}
-country |> 
-  dplyr::select(where(is.numeric)) |> 
-  summary()
-```
-
-```{r}
-country |> 
-  dplyr::select(where(is.numeric)) |> 
-  cor()
-```
-
-```{r}
-country |> 
-  ggplot(aes(x = tempo, y = energy)) +
-   geom_point()
-```
-```{r}
-country |> 
-  select(tempo, energy) |> 
-  cor()
-```
-
-```{r}
-pop |> 
-  select(tempo, energy) |> 
-  cor()
-```
-
-```{r}
-rap |> 
-  select(tempo, energy) |> 
-  cor()
-```
-
-```{r}
-billboard |> 
-  select(weeks, energy) |> 
-  cor()
-```
-
-
-
-```{r}
-write.csv(billboard, "../data/billboard_genre\\.csv", row.names = FALSE)
-```
-
-```{r}
-billboard |> 
-  select(where(is.numeric), -year, -peak_pos, -weeks, -rank, -duration_ms, -last_pos, -mode, -time_signature, -key) |> 
-  colnames()
-```
-
-```{r}
-billboard |> 
-  select(where(is.numeric), -year, -peak_pos, -weeks, -rank, -duration_ms, -last_pos, -mode, -time_signature, -key, -tempo, -loudness) |> 
-  colMeans()
-```
-
-```{r}
-billboard |> 
-  select(where(is.numeric), -year, -peak_pos, -weeks, -rank, -duration_ms, -last_pos, -mode, -time_signature, -key, -tempo, -loudness) |> 
-  colMeans() |> 
-  enframe(name = "Variable", value = "Mean")  |> 
-  ggplot(aes(x = Variable, y = Mean)) +
-  geom_col() +
-  labs(title = "Column Means", x = "Variables", y = "Mean Value")
+  filter(title %in% (top_songs |> pull(title))) |> 
+  select(title,year,main_artist, broad_genre, energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence) |> 
+pivot_longer(cols =-c("title", "year", "broad_genre","main_artist"), names_to = "variable", values_to = "value")  
   
+```
+
+ARTISTS
+```{r}
+billboard |> 
+  filter(weeks >= 14 & rank <= 50) |> 
+  count(main_artist) |> 
+  arrange(desc(n)) |> 
+  filter(n > 1) |> 
+  mutate(median_of_n = median(n)) 
+  
+  
+```
+
+```{r}
+#artist with more than 3 songs that charted at least 14 weeks and ranked lower than 50. 
+top_artists <-
+billboard |> 
+  filter(weeks >= 14 & rank <= 50) |> 
+   group_by(main_artist)  |> 
+  filter(n() > 3)  |> 
+  arrange(desc(n()))
+
+top_artists
+```
+
+```{r}
+billboard |> 
+  filter(change == "Hot Shot Debut")
+```
+```{r}
+billboard |> 
+  filter(change == "New")
+```
+```{r}
+billboard |> 
+  filter(change == "Re-Entry")
+```
+
+
+
+
+
+
+```{r}
+# billboard <- billboard |> 
+#   filter(weeks >= 14, rank <= 50)
+```
+
+```{r}
+# write.csv(billboard, "../data/billboard_genre\\.csv", row.names = FALSE)
+```
+```{r}
+# write.csv(billboard_pivoted, "../data/billboard_pivot\\.csv", row.names = FALSE)
+```
+
+
+```{r}
+# billboard |> 
+#   select(where(is.numeric), -year, -peak_pos, -weeks, -rank, -duration_ms, -last_pos, -mode, -time_signature, -key, -tempo, -loudness) |> 
+#   colMeans() |> 
+#   enframe(name = "Variable", value = "Mean")  |> 
+#   ggplot(aes(x = Variable, y = Mean)) +
+#   geom_col() +
+#   labs(title = "Column Means", x = "Variables", y = "Mean Value")
+
 ```
 REGRESSIONS
 
 ```{r}
-billboard_weeks_lm <- lm("weeks ~ energy", data = billboard)
+logistic_model <- glm(number_one ~ weeks + rank, data = billboard, family = "binomial")
+
+summary(logistic_model)
 ```
-
+energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence
 ```{r}
-summary(billboard_weeks_lm)
-```
+#Logistic models that checks how energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence may determine if a song reaches the number one spot. 
+logistic_model <- glm(number_one ~ energy + liveness + speechiness + acousticness + instrumentalness + danceability + valence, data = billboard, family = "binomial")
 
-```{r}
-reduced_model <- lm("weeks ~ energy", data = billboard)
-full_model <- lm("weeks ~ energy + liveness", data = billboard)
-
-anova(reduced_model, full_model)
+summary(logistic_model)
 ```
 
 ```{r}
@@ -208,6 +162,28 @@ anova(reduced_model, full_model)
 ```{r}
 
 ```
+
+
+
+
+
+
+
+```{r}
+# billboard_weeks_lm <- lm("weeks ~ energy", data = billboard)
+# summary(billboard_weeks_lm)
+```
+
+```{r}
+# reduced_model <- lm("weeks ~ energy", data = billboard)
+# full_model <- lm("weeks ~ energy + liveness", data = billboard)
+# 
+# anova(reduced_model, full_model)
+```
+
+
+
+
 
 
 

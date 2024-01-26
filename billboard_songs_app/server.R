@@ -16,7 +16,7 @@ function(input, output, session) {
   #
   # First Tab: Bar Plots that shows the average values of songs in a particular genre and 
   #the values of the number one song of a particular genre in a specific year.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+  
   output$barPlot <- renderPlot({
     
     filtered()  |> 
@@ -38,27 +38,32 @@ function(input, output, session) {
       labs(title =paste("Longest Charted",input$broad_genre,"Song in the year", input$years), x = "Song Variables", y = "Song Value")
     
   })
+  
+  
   #Second Tab: that allows users to select values for energy, valence and danceability, and the output will be a 
   #table showing songs with variables closets to the select values.
   output$table <- renderDataTable({ 
     valence_selection <- input$valence_value
     danceability_selection <- input$danceability_value
+    energy_selection <- input$energy_value
     
-  variable_distance <-
-    billboard |> 
-    mutate(distance = abs(energy - energy_selection) + abs(danceability - danceability_selection) + abs(valence - valence_selection)) |> 
-    select(year, title, main_artist, peak_pos, weeks, broad_genre, energy, valence, danceability, distance) |>
-    arrange(distance) |> 
-    head(3)
+    variable_distance <-
+      billboard |> 
+      mutate(distance = abs(energy - energy_selection) + abs(danceability - danceability_selection) + abs(valence - valence_selection)) |> 
+      select(year, title, main_artist, peak_pos, weeks, broad_genre, energy, valence, danceability, distance) |>
+      arrange(distance) |> 
+      head(3)
   }, options = list(scrollX = TRUE))
   
   
+  
+  
   #Third tab: A plot showing how variables are distributed amongst genres
-  output$distPlot2 <- renderPlot({
+  output$boxPlot <- renderPlot({
     billboard |> 
       ggplot(aes(x = broad_genre, y = .data[[input$hist_variable]])) +
-       geom_boxplot(color = "black") +
-      labs(title = paste("DIstribution of", input$hist_variable, "by Genre"),
+      geom_boxplot(color = "black") +
+      labs(title = paste("Distribution of", input$hist_variable, "by Genre"),
            x = "Genre", y = input$hist_variable)
     
   })
@@ -70,7 +75,16 @@ function(input, output, session) {
       ggplot(aes(x = .data[[input$hist_variable]])) +
       geom_histogram(bins = input$bins) +
       labs(x = input$hist_variable,
-           title = paste('Histogram of', input$broad_genre))
+           title = paste('Distribution of', input$hist_variable))
+    
+  })
+  
+  output$genrePlot <- renderPlot({
+    billboard |> 
+      count(broad_genre) |> 
+      ggplot(aes(x = broad_genre, y = n)) +
+      geom_col(fill = "purple") +
+      labs(title = "Number of Songs per Genre", x="Genre", y="Count")
     
   })
   
@@ -82,24 +96,21 @@ function(input, output, session) {
   })
   
   output$artistTable <- renderDT({
-     billboard |> 
-    #artist_data() |> 
-      select(date, title, main_artist, peak_pos, weeks, broad_genre, energy, valence, danceability) 
-  }, options = list(scrollX = TRUE, lengthMenu = c(5, 30, 50)))
-  
-
-  output$artist_mini_table <- renderTable({
-    #billboard |> 
     artist_data() |> 
-    filter(main_artist == input$artist_variable) |> 
+      select(date, title, main_artist, peak_pos, weeks, broad_genre, energy, valence, danceability) 
+  }, options = list(scrollX = TRUE, lengthMenu = c(5, 30, 50), dom = "t"))
+  
+  
+  output$artist_mini_table <- renderTable({
+    artist_data() |> 
       select(peak_pos, weeks, rank, energy, valence, danceability) |> 
       colMeans() |> 
       enframe(name = "Variable", value = "Mean")
-      
+    
   })
   
   
   
   
-
+  
 }

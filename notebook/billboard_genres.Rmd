@@ -93,7 +93,7 @@ top_artists <-
 billboard |> 
   filter(weeks >= 14 & rank <= 50) |> 
    group_by(main_artist)  |> 
-  filter(n() > 3)  |> 
+  filter(n() >= 3)  |> 
   arrange(desc(n()))
 
 top_artists
@@ -123,7 +123,7 @@ billboard |>
 ```
 
 ```{r}
-# write.csv(billboard, "../data/billboard_genre\\.csv", row.names = FALSE)
+#write.csv(billboard, "../data/billboard_genre\\.csv", row.names = FALSE)
 ```
 ```{r}
 # write.csv(billboard_pivoted, "../data/billboard_pivot\\.csv", row.names = FALSE)
@@ -149,21 +149,65 @@ summary(logistic_model)
 ```
 energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence
 ```{r}
-#Logistic models that checks how energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence may determine if a song reaches the number one spot. 
-logistic_model <- glm(number_one ~ energy + liveness + speechiness + acousticness + instrumentalness + danceability + valence, data = billboard, family = "binomial")
+#Logistic models that checks how energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence may determine if a song reaches the number one spot for years 2000-2017. 
+logistic_model <- glm(number_one ~  danceability + valence + energy + liveness + speechiness + acousticness + instrumentalness +  + tempo, data = billboard, family = "binomial")
+
+summary(logistic_model)
+```
+```{r}
+billboard_early_years <-
+  billboard |> 
+  filter(year <= 2005)
+```
+```{r}
+#Logistic models that checks how energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence may determine if a song reaches the number one spot from the years 2000-2005. 
+logistic_model <- glm(number_one ~ valence + energy + danceability + liveness + speechiness + acousticness + instrumentalness +  + tempo, data = billboard_early_years, family = "binomial")
+
+summary(logistic_model)
+```
+```{r}
+billboard_late_years <-
+  billboard |> 
+  filter(year >= 2012)
+```
+
+```{r}
+##Logistic models that checks how energy, liveness, speechiness, acousticness, instrumentalness, danceability, valence may determine if a song reaches the number one spot from the years 2012-2017. 
+logistic_model <- glm(number_one ~ valence +  danceability + speechiness + energy + liveness + acousticness + instrumentalness +  + tempo, data = billboard_late_years, family = "binomial")
 
 summary(logistic_model)
 ```
 
-```{r}
 
+
+
+
+
+```{r}
+energy_selection <- 0.5
+valence_selection <- 0.6
+danceability_selection <- 0.7
 ```
 
 ```{r}
-
+variable_distance <- billboard |> 
+  mutate(distance = abs(energy - energy_selection) + abs(danceability - danceability_selection) + abs(valence - valence_selection)) |> 
+  arrange(distance)
 ```
 
+```{r}
+billboard |> 
+ filter(main_artist == "taylor swift") |> 
+  select(-artist, -change, -month, -week_number, -seasons, number_one) |> 
+  colMeans()
+  
+```
 
+```{r}
+billboard |> 
+  filter(main_artist == "taylor swift") |> 
+
+```
 
 
 

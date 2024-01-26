@@ -4,8 +4,8 @@ library(shiny)
 dashboardPage(skin = "green",
               dashboardHeader(title = "Billboards"),
               dashboardSidebar(sidebarMenu(menuItem("First tab", tabName = "first_tab", icon = icon("bar-chart")),
-                                           menuItem("Second tab", tabName = "second_tab", icon = icon("sliders")),
-                                           menuItem("Third tab", tabName = "third_tab", icon = icon("")),
+                                           menuItem("Second tab", tabName = "second_tab", icon = icon("")),
+                                           menuItem("Third tab", tabName = "third_tab", icon = icon("sliders")),
                                            menuItem("Fourth tab", tabName = "fourth_tab", icon = icon("microphone-lines"))
               )),
               dashboardBody(
@@ -14,8 +14,8 @@ dashboardPage(skin = "green",
                   tabItem("first_tab",
                           sidebarLayout(
                             sidebarPanel(
-                
-                               selectInput("broad_genre", 
+                              
+                              selectInput("broad_genre", 
                                           label = "Select a genre:", 
                                           choices = genres_choices), 
                               
@@ -33,7 +33,7 @@ dashboardPage(skin = "green",
                           )
                   ),
                   
-                  # Second Tab 
+                  #Second Tab
                   tabItem("second_tab",
                           sidebarLayout(
                             sidebarPanel(
@@ -58,11 +58,14 @@ dashboardPage(skin = "green",
                             )
                           )
                   ),
-                  #third Tab
+                  
+                  
+                  
+                  # Third Tab 
                   tabItem("third_tab",
                           sidebarLayout(
                             sidebarPanel(
-                             sliderInput("bins",
+                              sliderInput("bins",
                                           "Number of bins:",
                                           min = 1,
                                           max = 50,
@@ -71,19 +74,21 @@ dashboardPage(skin = "green",
                             ),
                             
                             mainPanel(
-                              plotOutput("distPlot2"),
+                              fluidRow(column(width = 6, plotOutput("boxPlot")),
+                                       column(width = 6, plotOutput("genrePlot"))),
                               fluidRow(column(width = 12, plotOutput("distPlot")))
-                           )
+                            )
                           )),
+                  
                   
                   #fourth tab
                   tabItem("fourth_tab",
-                           mainPanel(
-                              textInput("artist_variable", "Enter Artist Name"),
-                              DTOutput("artistTable"),
-                              tableOutput("artist_mini_table")
-                            ),
-                        
+                          mainPanel(
+                            textInput("artist_variable", "Enter Artist Name"),
+                            DTOutput("artistTable"),
+                            tableOutput("artist_mini_table")
+                          ),
+                          
                           
                   )
                   

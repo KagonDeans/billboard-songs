@@ -1,0 +1,30 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-01-18"
+---
+
+filtered <- reactive({
+    if (input$island == "All"){
+      island_filter <- island_choices
+    } else {
+      island_filter <- input$island
+    }
+    
+    penguins |>
+      filter(island %in% island_filter)
+  })
+  
+  
+  output$distPlot <- renderPlot({
+    
+    filtered() |>
+      drop_na(input$hist_variable) |>
+      ggplot(aes(x = .data[[input$hist_variable]])) +
+      geom_histogram(bins = input$bins) +
+      #scale_x_continuous(limits = c(min(penguins$body_mass_g, na.rm = TRUE),
+      #                              max(penguins$body_mass_g, na.rm = TRUE))) +
+      labs(x = 'Body Mass (g)',
+           title = 'Histogram of body mass values')
+    
+  })

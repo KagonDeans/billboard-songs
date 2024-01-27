@@ -90,27 +90,50 @@ function(input, output, session) {
   
   
   #Fourth Tab: Creating a table where the user can select an artist and they will get barplot of the means.
-  artist_data <- reactive({
+  artist_data <-
+    reactive({
     billboard |> 
+      arrange(peak_pos, desc(weeks)) |>  
       filter(main_artist == input$artist_variable)
   })
+
+  
   
   output$artistTable <- renderDT({
     artist_data() |> 
       select(date, title, main_artist, peak_pos, weeks, broad_genre, energy, valence, danceability) 
-  }, options = list(scrollX = TRUE, lengthMenu = c(5, 30, 50), dom = "t"))
+  }, options = list(scrollX = TRUE, lengthMenu = c(5, 30, 50)))
   
   
-  output$artist_mini_table <- renderTable({
+ 
+  output$peakdistPlot <- renderPlot({
     artist_data() |> 
-      select(peak_pos, weeks, rank, energy, valence, danceability) |> 
-      colMeans() |> 
-      enframe(name = "Variable", value = "Mean")
+    ggplot(aes(x = peak_pos)) +
+      geom_histogram(bins = input$bins) +
+      labs(x = "Peak Position",
+           title = paste('Distribution of',input$artist_variable, 'Peak Position on the charts'))
     
   })
   
+  output$weeksdistPlot <- renderPlot({
+    artist_data() |> 
+    ggplot(aes(x = weeks)) +
+      geom_histogram(bins = input$bins) +
+      labs(x = "Amount of Weeks",
+           title = paste('Distribution of weeks', input$artist_variable,'spent on charts'))
+    
+  })
   
-  
-  
+  output$peakweekboxPlot <- renderPlot({
+    artist_data() |> 
+      select(energy, valence, danceability) |> 
+    pivot_longer(cols = everything()) |> 
+      ggplot(aes(x = name, y = value)) +
+      geom_boxplot() +
+      labs(x ="idk" ,
+           title = ('Distribution of'))
+    
+    
+  })
   
 }

@@ -19,11 +19,23 @@ The tools used are:
 
 
 **Usage:**
+My dashboard comprises four tabs, each offering unique functionalities:
 
+
+1. "Analyse a Genre": This tab allows users to explore how different genres and years impact the average values of Spotify audio features. Users can select a genre and a year to view bar graphs displaying the average values of Spotify audio features for that genre and year. Additionally, users can view the Spotify audio features of songs that stayed the longest on the Billboard charts in the selected genre and year.
+
+2. "Make a Hit Song": In this tab, users can experiment with values for energy, danceability, and valence features to see how they affect the likelihood of a song reaching the number one spot on the charts. Based on statistical analysis, only energy, danceability, and valence show significance. Users can input values for these features and view three songs with values closest to the chosen ones, along with their peak positions on the charts. Notably, certain combinations of feature values may result in songs reaching the number one spot.
+
+3. "Check out the Spread": This tab illustrates the distribution of Spotify audio features across different genres. Users can select a variable to view its distribution via boxplot graphs. Additionally, a bar plot displays the number of songs per genre in the dataset, while a distribution plot shows the overall distribution of the selected variable.
+
+4. "Explore an Artist": Here, users can search for an artist and view a table of all their songs from the years 2000 to 2017 that have been on the charts. The tab also includes two distribution plots: one illustrating the distribution of the artist's peak positions on the Billboard charts and the other displaying the distribution of the number of weeks the artist's songs have spent on the Billboard Hot 100 charts. 
 
 
 **Future Goals**
-I wanted to look at how artists contributing to song effects its popularity. there was many different ways in the data to state if a song had contribution. I have to pin down all the ways and the change it to one specific way. I also wanted to explore if there were songs that has audio features that makes them a good summer song or love song or dance song. 
+
+In the future, I want to fix the problem of different ways artists' collaborations are shown in the data. These differences make it hard to figure out how much each artist contributed to a song. To solve this, I'll make sure all collaborations are written in the same way. This will help me better understand how artist involvement affects how popular a song becomes.
+
+Additionally, I am keen to investigate whether certain songs exhibit audio features that classify them as ideal summer songs, love songs, or dance tracks. This exploration promises insights into the characteristics that contribute to a song's association with particular moods or occasions.
 
 **Acknowledgments:**
 
@@ -39,14 +51,6 @@ Data Insights
 
 
 
-
-project workflow or schedule
-
-1.	Get the Data (01/06/2024)
-2.	Clean & Explore the Data (01/09/2024)
-3.	Create Presentation and Shiny App (01/20/2024)
-4.	Internal Demos (1/23/2024)
-5.	Midcourse Project Presentations (1/27/2024)
 
 
 
